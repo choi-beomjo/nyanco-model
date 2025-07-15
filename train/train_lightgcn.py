@@ -54,3 +54,11 @@ for epoch in range(1, 101):
     optimizer.step()
 
     print(f"Epoch {epoch:03d}, Loss: {loss.item():.4f}")
+
+# 최종 임베딩 저장
+model.eval()
+with torch.no_grad():
+    final_embeddings = model.get_embedding(data.edge_index)
+
+torch.save(final_embeddings, "../graph/character_embeddings.pt")
+print("Character embeddings saved.")
