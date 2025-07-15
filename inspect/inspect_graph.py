@@ -28,6 +28,7 @@ offsets = {
     "skill": (get_offset("skill"), get_max_idx(node_mapping["skill_id_to_idx"])),
     "immunity": (get_offset("immunity"), get_max_idx(node_mapping["immunity_id_to_idx"])),
     "enemy": (get_offset("enemy"), get_max_idx(node_mapping["enemy_id_to_idx"])),
+    "stage": (get_offset("stage"), get_max_idx(node_mapping["stage_id_to_idx"]))
 }
 
 print("\n[노드 타입별 인덱스 범위]")
