@@ -2,6 +2,7 @@
 import pandas as pd
 import torch
 import os
+import json
 
 # 디렉토리 설정
 DATA_DIR = "../db"
@@ -25,6 +26,8 @@ immunities = pd.read_csv(f"{DATA_DIR}/immunities.csv")
 
 stage_enemies = pd.read_csv(f"{DATA_DIR}/stage_enemies.csv")
 stages = pd.read_csv(f"{DATA_DIR}/stages.csv")
+# user_experience.csv 추가 로딩
+user_exp = pd.read_csv(f"{DATA_DIR}/user_experiences.csv")
 
 # 노드 인덱스 생성
 character_ids = characters["id"].tolist()
@@ -111,6 +114,20 @@ for _, row in stage_enemies.iterrows():
     s = stage_id_to_idx.get(row["stage_id"])
     if e is not None and s is not None:
         add_bidirectional_edge(e, s)
+
+
+
+# character ↔ stage (from user experience)
+for _, row in user_exp.iterrows():
+    s = stage_id_to_idx.get(str(row["stage_id"]))  # stage_id는 str로 변환 필요
+    try:
+        characters_data = json.loads(row["characters_data"].replace("''", '"').replace("True", "true").replace("False", "false"))
+    except:
+        continue
+    for ch in characters_data:
+        c = character_id_to_idx.get(ch.get("character_id"))
+        if c is not None and s is not None:
+            add_bidirectional_edge(c, s)
 
 # edge_index 저장
 edge_index = torch.tensor([src_list, dst_list], dtype=torch.long)
