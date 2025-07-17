@@ -12,7 +12,11 @@ char_ids = list(node_mapping["character_id_to_idx"].values())
 stage_ids = list(node_mapping["stage_id_to_idx"].values())
 
 num_nodes = max(edge_index[0].max(), edge_index[1].max()).item() + 1
-data = Data(edge_index=edge_index, num_nodes=num_nodes)
+
+reversed_edge_index = edge_index[[1, 0], :]
+bi_edge_index = torch.cat([edge_index, reversed_edge_index], dim=1)
+data = Data(edge_index=bi_edge_index, num_nodes=num_nodes)
+
 
 # character ↔ stage 관계만 positive edge로 필터링
 positive_edges = []
@@ -60,5 +64,17 @@ model.eval()
 with torch.no_grad():
     final_embeddings = model.get_embedding(data.edge_index)
 
-torch.save(final_embeddings, "../graph/character_embeddings.pt")
+char_embeddings = final_embeddings[
+    torch.tensor(list(node_mapping["character_id_to_idx"].values()))
+]
+
+stage_embeddings = final_embeddings[
+    torch.tensor(list(node_mapping["stage_id_to_idx"].values()))
+]
+
+# 저장 가능
+torch.save(char_embeddings, "../graph/character_embeddings.pt")
+torch.save(stage_embeddings, "../graph/stage_embeddings.pt")
+
+torch.save(final_embeddings, "../graph/full_embeddings.pt")
 print("Character embeddings saved.")
