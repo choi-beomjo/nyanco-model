@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import torch
+from model.deep_rec_model import DeepRecModel
+import torch.nn as nn
 
 
 train_df = pd.read_csv('../preprocessing/deep_train_with_stats.csv')
@@ -55,6 +57,7 @@ y = train_df["label"].values
 
 from sklearn.model_selection import train_test_split
 
+# 스테이지 아이디를 기준으로 데이터 분류
 all_stage_ids = train_df["stage_id"].unique()
 
 # 1차: train + temp
@@ -92,24 +95,6 @@ X_train, y_train = build_X_y(df_train)
 X_val, y_val = build_X_y(df_val)
 X_test, y_test = build_X_y(df_test)
 
-
-import torch
-import torch.nn as nn
-
-class DeepRecModel(nn.Module):
-    def __init__(self, input_dim=144):
-        super().__init__()
-        self.mlp = nn.Sequential(
-            nn.Linear(input_dim, 128),
-            nn.ReLU(),
-            nn.Linear(128, 64),
-            nn.ReLU(),
-            nn.Linear(64, 1),
-            nn.Sigmoid()
-        )
-
-    def forward(self, x):
-        return self.mlp(x)
 
 
 from torch.utils.data import TensorDataset, DataLoader
@@ -154,3 +139,5 @@ for epoch in range(1, 21):
     acc = correct / total
 
     print(f"[Epoch {epoch}] Loss: {total_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {acc:.4f}")
+
+torch.save(model, "deeprec_model.pt")
