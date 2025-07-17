@@ -55,9 +55,43 @@ y = train_df["label"].values
 
 from sklearn.model_selection import train_test_split
 
-X_train, X_val, y_train, y_val = train_test_split(
-    X, y, test_size=0.2, stratify=y, random_state=42
+all_stage_ids = train_df["stage_id"].unique()
+
+# 1차: train + temp
+stage_train, stage_temp = train_test_split(
+    all_stage_ids, test_size=0.3, random_state=42
 )
+
+# 2차: validation + test
+stage_val, stage_test = train_test_split(
+    stage_temp, test_size=0.5, random_state=42
+)
+
+df_train = train_df[train_df["stage_id"].isin(stage_train)]
+df_val   = train_df[train_df["stage_id"].isin(stage_val)]
+df_test = train_df[train_df["stage_id"].isin(stage_test)]
+
+def build_X_y(df):
+    X = []
+    for _, row in df.iterrows():
+        stage_id = row["stage_id"]
+        character_id = row["character_id"]
+
+        stage_emb = embeddings[stage_id_to_idx[stage_id]].numpy()
+        char_emb = embeddings[char_id_to_idx[character_id]].numpy()
+        stat_vec = char_stat_dict[character_id]
+
+        X.append(np.concatenate([stage_emb, char_emb, stat_vec]))
+
+    X = np.array(X, dtype=np.float32)
+    y = df["label"].values.astype(np.float32)
+    return X, y
+
+# 실행
+X_train, y_train = build_X_y(df_train)
+X_val, y_val = build_X_y(df_val)
+X_test, y_test = build_X_y(df_test)
+
 
 import torch
 import torch.nn as nn
