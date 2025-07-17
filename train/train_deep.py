@@ -103,4 +103,20 @@ for epoch in range(1, 21):
         optimizer.step()
         total_loss += loss.item()
 
-    print(f"[Epoch {epoch}] Loss: {total_loss:.4f}")
+    # 검증 단계
+    model.eval()
+    val_loss = 0
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for xb, yb in val_loader:
+            pred = model(xb).squeeze()
+            loss = loss_fn(pred, yb)
+            val_loss += loss.item()
+            predicted = (pred >= 0.5).float()
+            correct += (predicted == yb).sum().item()
+            total += yb.size(0)
+
+    acc = correct / total
+
+    print(f"[Epoch {epoch}] Loss: {total_loss:.4f} | Val Loss: {val_loss:.4f} | Val Acc: {acc:.4f}")
