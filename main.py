@@ -1,3 +1,5 @@
+import pickle
+
 from model.deep_rec_model import DeepRecModel
 import pandas as pd
 import torch
@@ -27,8 +29,29 @@ if __name__ == "__main__":
 
     char_stat_dict = get_normalize_scaler(character_df)
 
+    with open("char_stat_dict.pkl", "wb") as f:
+        pickle.dump(char_stat_dict, f)
+
     train_loader, val_loader, test_loader = set_data_train_val_by_stage(train_df, embeddings, stage_id_to_idx, char_id_to_idx, char_stat_dict)
 
     model = DeepRecModel()
 
     train_loop(model, epochs=21, train_loader=train_loader, val_loader=val_loader)
+
+    all_preds = []
+    all_labels = []
+
+    with torch.no_grad():
+        for xb, yb in test_loader:
+            preds = model(xb).squeeze()
+            all_preds.extend(preds.numpy())
+            all_labels.extend(yb.numpy())
+
+
+    from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
+
+    thresholded_preds = [1 if p >= 0.5 else 0 for p in all_preds]
+
+    print("Accuracy:", accuracy_score(all_labels, thresholded_preds))
+    print("ROC AUC:", roc_auc_score(all_labels, all_preds))
+    print("F1 Score:", f1_score(all_labels, thresholded_preds))

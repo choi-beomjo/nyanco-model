@@ -5,7 +5,11 @@ import pandas as pd
 import numpy as np
 
 
-def recommend_characters(stage_id, top_k=5):
+def recommend_characters(stage_id, embeddings, node_mapping, character_df, char_stat_dict, model, top_k=5):
+
+    stage_id_to_idx = node_mapping["stage_id_to_idx"]
+    char_id_to_idx = node_mapping["character_id_to_idx"]
+
     stage_vec = embeddings[stage_id_to_idx[stage_id]].numpy()  # (64,)
 
     candidates = []
@@ -29,7 +33,7 @@ def recommend_characters(stage_id, top_k=5):
 
 if __name__ == "__main__":
 
-    train_df = pd.read_csv('../preprocessing/deep_train_with_stats.csv')
+    #train_df = pd.read_csv('../preprocessing/deep_train_with_stats.csv')
 
     embeddings = torch.load("../graph/full_embeddings.pt")
     node_mapping = torch.load("../graph/node_mapping_full.pt")
@@ -42,29 +46,16 @@ if __name__ == "__main__":
     model = torch.load("../deeprec_model.pt", weights_only=False)
     model.eval()
 
-    all_preds = []
-    all_labels = []
-
-    _, _, test_loader = set_data_train_val_by_stage(train_df, embeddings, stage_id_to_idx, char_id_to_idx, char_stat_dict)
-
-    with torch.no_grad():
-        for xb, yb in test_loader:
-            preds = model(xb).squeeze()
-            all_preds.extend(preds.numpy())
-            all_labels.extend(yb.numpy())
-
-
-    from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
-
-    thresholded_preds = [1 if p >= 0.5 else 0 for p in all_preds]
-
-    print("Accuracy:", accuracy_score(all_labels, thresholded_preds))
-    print("ROC AUC:", roc_auc_score(all_labels, all_preds))
-    print("F1 Score:", f1_score(all_labels, thresholded_preds))
 
     char_name = character_df.set_index("id")["name"].to_dict()
 
-    top5 = recommend_characters(stage_id="d4d", top_k=5)
+    top5 = recommend_characters(stage_id="d4d",
+                                embeddings=embeddings,
+                                node_mapping=node_mapping,
+                                character_df=character_df,
+                                char_stat_dict=char_stat_dict,
+                                model=model,
+                                top_k=10)
     for rank, (char_id, score) in enumerate(top5, 1):
         print(f"{rank}. {char_name[char_id]} (ID {char_id}) - Score: {score:.4f}")
 
