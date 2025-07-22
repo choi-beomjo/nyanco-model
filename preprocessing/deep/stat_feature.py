@@ -18,7 +18,7 @@ def get_normalize_scaler(character_df):
     # character_df = pd.read_csv('../db/characters.csv')
 
     normalized_stats = scaler.fit_transform(character_df[stat_features])
-    joblib.dump(scaler, "stat_scaler.pkl")
+    joblib.dump(scaler, "../stat_scaler.pkl")
 
     # character_df에는 character_id 컬럼이 있다고 가정
     character_id_list = character_df["id"].tolist()

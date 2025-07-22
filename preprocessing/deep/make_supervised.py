@@ -1,7 +1,7 @@
 import pandas as pd
 import json
 
-df = pd.read_csv("../db/user_experiences.csv")
+df = pd.read_csv("../../db/user_experiences.csv")
 
 positive_pairs = set()
 
