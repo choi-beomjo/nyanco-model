@@ -1,6 +1,5 @@
 import torch
-from train.train_deep import set_data_train_val_by_stage
-from preprocessing.stat_feature import get_normalize_scaler
+from preprocessing.deep.stat_feature import get_normalize_scaler
 import pandas as pd
 import numpy as np
 
