@@ -33,6 +33,9 @@ if __name__ == "__main__":
     char_id_to_idx = node_mapping["character_id_to_idx"]
     character_df = pd.read_csv('../db/characters.csv')
 
+    # 🔸 character_id → base_id 매핑 딕셔너리
+    charid_to_baseid = dict(zip(character_df["id"], character_df["base_id"]))
+
     char_stat_dict = get_normalize_scaler(character_df)
 
     model = torch.load("../deeprec_model.pt", weights_only=False)
@@ -56,13 +59,17 @@ if __name__ == "__main__":
 
         char_ids_models = [char_id for rank, (char_id, score) in enumerate(top5, 1)]
 
+        base_ids_models = {charid_to_baseid.get(cid, -1) for cid in char_ids_models}
+
         raw = row["characters_data"]  # 이건 문자열임
         clean_json_str = raw.replace('""', '"')  # CSV 이중 따옴표 처리 해제
         characters = json.loads(clean_json_str)
 
         character_ids_ex = [c["character_id"] for c in characters]
+        base_ids_ex = {charid_to_baseid.get(cid, -2) for cid in character_ids_ex}
 
-        precision, recall, f1 = f1_at_k(char_ids_models, character_ids_ex)
+        precision, recall, f1 = f1_at_k(base_ids_models, base_ids_ex)
+            # (f1_at_k(char_ids_models, character_ids_ex))
 
         # print(f"유저 경험 {row['id']} - precision {precision}")
 
