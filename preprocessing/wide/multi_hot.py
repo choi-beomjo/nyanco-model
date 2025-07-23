@@ -1,5 +1,6 @@
 import pandas as pd
 import torch
+import os
 
 
 def create_multi_hot_matrix(df, id_col, feature_col, prefix):
@@ -20,6 +21,50 @@ def create_multi_hot_matrix(df, id_col, feature_col, prefix):
     pivot_df.columns = [f"{prefix}_{col}" for col in pivot_df.columns]
     return pivot_df, torch.tensor(pivot_df.values).float()
 
+
+def build_wide_features(data_dir, save_dir):
+    os.makedirs(save_dir, exist_ok=True)
+
+    character_ids = pd.read_csv(f"{data_dir}/characters.csv")["id"].unique()
+    enemy_ids = pd.read_csv(f"{data_dir}/enemies.csv")["id"].unique()
+
+    def process_and_save(entity, feature, prefix, pre_id):
+        df = pd.read_csv(f"{data_dir}/{entity}_{feature}.csv")
+        pivot_df, tensor = create_multi_hot_matrix(df, f"{entity}_id", f"{pre_id}_id", prefix)
+        pivot_df = pivot_df.reindex(character_ids if entity == "character" else enemy_ids, fill_value=0).astype(int)
+
+        pivot_df.to_csv(f"{save_dir}/{entity}_{feature}_wide.csv")
+        torch.save(tensor, f"{save_dir}/{entity}_{feature}.pt")
+        return pivot_df
+
+    # 개별 wide feature 처리
+    char_skill_df = process_and_save("character", "skills", "skill", "skill")
+    char_prop_df = process_and_save("character", "properties", "prop", "property")
+    char_imm_df = process_and_save("character", "immunities", "imm", "immunity")
+
+    enemy_skill_df = process_and_save("enemy", "skills", "skill", "skill")
+    enemy_prop_df = process_and_save("enemy", "properties", "prop", "property")
+    enemy_imm_df = process_and_save("enemy", "immunities", "imm", "immunity")
+
+    # 통합
+    char_wide_df = pd.concat([char_skill_df, char_prop_df, char_imm_df], axis=1).fillna(0).astype(int)
+    enemy_wide_df = pd.concat([enemy_skill_df, enemy_prop_df, enemy_imm_df], axis=1).fillna(0).astype(int)
+
+    char_wide_tensor = torch.tensor(char_wide_df.values).float()
+    enemy_wide_tensor = torch.tensor(enemy_wide_df.values).float()
+
+    char_wide_dict = {int(cid): char_wide_tensor[i] for i, cid in enumerate(char_wide_df.index)}
+    enemy_wide_dict = {int(eid): enemy_wide_tensor[i] for i, eid in enumerate(enemy_wide_df.index)}
+
+    torch.save(char_wide_dict, f"{save_dir}/character_wide_feature_dict.pt")
+    torch.save(enemy_wide_dict, f"{save_dir}/enemy_wide_feature_dict.pt")
+
+    # stage - enemy mapping
+    df = pd.read_csv(f"{data_dir}/stage_enemies.csv")
+    stage_enemies_dict = df.groupby("stage_id")["enemy_id"].apply(list).to_dict()
+    torch.save(stage_enemies_dict, f"{save_dir}/stage_enemies.pt")
+
+    print("✅ wide feature 저장 완료")
 
 
 if __name__ == "__main__":

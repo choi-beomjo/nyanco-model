@@ -170,6 +170,27 @@ def save_node_mapping(graph_dir: str, character_id_to_idx: Dict, enemy_id_to_idx
     torch.save(node_mapping, f"{graph_dir}/node_mapping_full.pt")
 
 
+def build_graph(DATA_DIR, GRAPH_DIR):
+
+    characters, properties, skills, immunities, enemies, stages, \
+        char_props, char_skills, char_immus, \
+        enemy_props, enemy_skills, enemy_immus, \
+        stage_enemies, user_exp = load_db_csv(DATA_DIR)
+
+    character_id_to_idx, property_id_to_idx, skill_id_to_idx, immunity_id_to_idx, enemy_id_to_idx, stage_id_to_idx = \
+        make_node_index(characters, properties, skills, immunities, enemies, stages)
+
+    src_list, dst_list = make_edge_list(char_props, char_skills, char_immus, enemy_props, enemy_skills, enemy_immus,
+                                        character_id_to_idx, enemy_id_to_idx,
+                                        property_id_to_idx, skill_id_to_idx, immunity_id_to_idx,
+                                        stage_enemies, stage_id_to_idx, user_exp)
+
+    save_edge_index(GRAPH_DIR, src_list, dst_list)
+
+    save_node_mapping(GRAPH_DIR, character_id_to_idx, enemy_id_to_idx, property_id_to_idx, skill_id_to_idx,
+                      immunity_id_to_idx, stage_id_to_idx)
+
+
 if __name__ == "__main__":
     # 디렉토리 설정
     DATA_DIR = "../../db"
