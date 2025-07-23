@@ -1,3 +1,4 @@
+import joblib
 import torch
 import pickle
 import pandas as pd
@@ -23,6 +24,8 @@ char_stat_dict = pickle.load(open("../char_stat_dict.pkl", "rb"))
 char_wide_dict = torch.load("../preprocessing/wide/multi_hot/character_wide_feature_dict.pt")
 enemy_wide_dict = torch.load("../preprocessing/wide/multi_hot/enemy_wide_feature_dict.pt")
 stage_enemies_dict = torch.load("../preprocessing/wide/multi_hot/stage_enemies.pt")
+enemy_stat_dict = joblib.load("../preprocessing/deep/enemy_stat_dict.pkl")
+
 
 character_df = pd.read_csv("../db/characters.csv")
 char_ids = character_df["id"].tolist()
@@ -44,6 +47,11 @@ deep_inputs, wide_inputs, char_id_list = [], [], []
 stage_enemy_wide = get_stage_enemy_wide(STAGE_ID)
 stage_emb = embeddings[stage_id_to_idx[STAGE_ID]]
 
+if STAGE_ID in enemy_stat_dict:
+    enemy_stat = torch.tensor(enemy_stat_dict[STAGE_ID], dtype=torch.float32)
+else:
+    enemy_stat = torch.zeros(len(next(iter(enemy_stat_dict.values()))))
+
 for char_id in char_ids:
     if char_id not in char_id_to_idx or char_id not in char_stat_dict or char_id not in char_wide_dict:
         continue
@@ -51,7 +59,7 @@ for char_id in char_ids:
     emb = embeddings[char_id_to_idx[char_id]]
 
     stat = torch.tensor(char_stat_dict[char_id], dtype=torch.float32)
-    deep_vec = torch.cat([emb, stage_emb, stat])
+    deep_vec = torch.cat([emb, stage_emb, stat, enemy_stat])
 
     wide_vec = torch.cat([char_wide_dict[char_id], stage_enemy_wide])
 
