@@ -26,6 +26,9 @@ if __name__ == "__main__":
     with open("char_stat_dict.pkl", "wb") as f:
         pickle.dump(char_stat_dict, f)
 
+
+    enemy_stat_dict = joblib.load("preprocessing/deep/enemy_stat_dict.pkl")
+
     # ---------------------------
     # 3. Wide feature 불러오기
     # ---------------------------
@@ -44,7 +47,8 @@ if __name__ == "__main__":
         char_stat_dict,
         char_wide_dict,
         enemy_wide_dict,
-        stage_enemies_dict
+        stage_enemies_dict,
+        enemy_stat_dict
     )
 
     # ---------------------------

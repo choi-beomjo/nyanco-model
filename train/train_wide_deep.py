@@ -14,7 +14,7 @@ def get_stage_enemy_wide(stage_id, enemy_wide_dict, stage_enemies_dict):
 
 def set_data_train_val_by_stage_with_char_enemy_wide(
     df, embeddings, stage_id_to_idx, char_id_to_idx, stat_dict,
-    char_wide_dict, enemy_wide_dict, stage_enemies_dict
+    char_wide_dict, enemy_wide_dict, stage_enemies_dict, enemy_stat_dict
 ):
     wide_inputs, deep_inputs, labels = [], [], []
 
@@ -27,7 +27,13 @@ def set_data_train_val_by_stage_with_char_enemy_wide(
         emb = embeddings[char_id_to_idx[char_id]]
         stage_emb = embeddings[stage_id_to_idx[stage_id]]
         stat = torch.tensor(stat_dict[char_id], dtype=torch.float32)
-        deep = torch.cat([emb, stage_emb, stat])
+
+        if stage_id in enemy_stat_dict:
+            enemy_stat = torch.tensor(enemy_stat_dict[stage_id], dtype=torch.float32)
+        else:
+            enemy_stat = torch.zeros(len(stat))  # fallback
+
+        deep = torch.cat([emb, stage_emb, stat, enemy_stat])
 
         # wide input = char_wide + enemy_wide
         char_vec = char_wide_dict[char_id]
