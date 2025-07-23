@@ -173,7 +173,7 @@ def save_node_mapping(graph_dir: str, character_id_to_idx: Dict, enemy_id_to_idx
 if __name__ == "__main__":
     # 디렉토리 설정
     DATA_DIR = "../../db"
-    GRAPH_DIR = "."
+    GRAPH_DIR = "../../graph"
     os.makedirs(GRAPH_DIR, exist_ok=True)
 
     characters, properties, skills, immunities, enemies, stages, \
