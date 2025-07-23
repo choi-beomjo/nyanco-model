@@ -3,7 +3,7 @@ import json
 from test_model.test_deep import recommend_characters
 import pandas as pd
 import torch
-from preprocessing.deep.stat_feature import get_normalize_scaler
+from preprocessing.deep.char_feature import get_normalize_scaler
 
 
 def f1_at_k(top_k, real_used):

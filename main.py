@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 import joblib
 from model.wide_and_deep import WideAndDeep
-from preprocessing.deep.stat_feature import get_normalize_scaler
+from preprocessing.deep.char_feature import get_normalize_scaler
 from train.train_wide_deep import train_loop, set_data_train_val_by_stage_with_char_enemy_wide
 from sklearn.metrics import accuracy_score, roc_auc_score, f1_score
 
