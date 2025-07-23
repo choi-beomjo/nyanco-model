@@ -6,7 +6,7 @@ import json
 
 # 디렉토리 설정
 DATA_DIR = "../../db"
-GRAPH_DIR = "../../graph"
+GRAPH_DIR = "."
 os.makedirs(GRAPH_DIR, exist_ok=True)
 
 # 데이터 로드
