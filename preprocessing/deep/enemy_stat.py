@@ -25,6 +25,38 @@ def build_stage_enemy_stat_dict(stage_enemies_df, enemy_stat_dict, stat_features
     return stage_enemy_stat_vec
 
 
+def make_enemy_feat(data_dir, deep_dir):
+    scaler = MinMaxScaler()
+
+    stat_features = [
+        "hp", "atk1", "atk2", "atk3",
+        "pre_atk1", "pre_atk2", "pre_atk3",
+        "back_atk", "atk_freq",
+        "range", "long_distance1", "long_distance2",
+        "money", "kb", "speed", "tba"
+    ]
+
+    enemy_df = pd.read_csv(f'{data_dir}/enemies.csv')
+    normalized_stats = scaler.fit_transform(enemy_df[stat_features])
+
+    joblib.dump(scaler, f"{deep_dir}/enemy_scaler.pkl")
+
+    enemy_id_list = enemy_df["id"].tolist()
+
+    # enemy_id -> normalized vector
+    enemy_stat_dict = {
+        char_id: normalized_stats[i]
+        for i, char_id in enumerate(enemy_id_list)
+    }
+
+    joblib.dump(enemy_stat_dict, f"{deep_dir}/enemy_stat_dict.pkl")
+
+    df = pd.read_csv(f'{data_dir}/stage_enemies.csv')
+
+    stage_enemy_stat_vec = build_stage_enemy_stat_dict(df, enemy_stat_dict, stat_features)
+    joblib.dump(stage_enemy_stat_vec, f"{deep_dir}/stage_enemy_stat_vec.pkl")
+
+
 if __name__ == "__main__":
 
     scaler = MinMaxScaler()

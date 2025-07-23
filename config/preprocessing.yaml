@@ -2,3 +2,4 @@ paths:
   db_dir: "../db"
   graph_dir: "../graph"
   wide_dir: "./wide/multi_hot"
+  deep_dir: "./deep"
