@@ -11,7 +11,7 @@ stat_features = [
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 
-def get_normalize_scaler(character_df):
+def get_normalize_scaler(character_df, deep_dir):
 
     scaler = MinMaxScaler()
 
@@ -28,6 +28,7 @@ def get_normalize_scaler(character_df):
         char_id: normalized_stats[i]
         for i, char_id in enumerate(character_id_list)
     }
+    joblib.dump(char_stat_dict, f"{deep_dir}/char_stat_dict.pkl")
 
     return char_stat_dict
 
@@ -48,7 +49,7 @@ def make_stat_vector(train_df, char_stat_dict, save_dir):
 
 def make_char_feat(data_dir, deep_dir):
     character_df = pd.read_csv(f"{data_dir}/characters.csv")
-    char_stat_dict = get_normalize_scaler(character_df)
+    char_stat_dict = get_normalize_scaler(character_df, deep_dir)
 
     train_df = pd.read_csv(f"{deep_dir}/stage_character_train.csv")
 
