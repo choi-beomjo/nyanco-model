@@ -3,12 +3,12 @@ import torch
 import pickle
 import pandas as pd
 from model.wide_and_deep import WideAndDeep
-from preprocessing.deep.stat_feature import get_normalize_scaler
+from preprocessing.deep.char_feature import get_normalize_scaler
 
 # -------------------------------
 # Configurable
 # -------------------------------
-STAGE_ID = "d4d"
+STAGE_ID = "qpf4"
 TOP_K = 10
 MODEL_PATH = "../wide_deep_model.pt"
 

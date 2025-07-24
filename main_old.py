@@ -5,7 +5,7 @@ import pandas as pd
 import torch
 import joblib
 from train.train_deep import train_loop, set_data_train_val_by_stage
-from preprocessing.deep.stat_feature import get_normalize_scaler
+from preprocessing.deep.char_feature import get_normalize_scaler
 
 if __name__ == "__main__":
     train_df = pd.read_csv('preprocessing/deep_train_with_stats.csv')

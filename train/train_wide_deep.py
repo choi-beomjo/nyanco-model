@@ -14,7 +14,8 @@ def get_stage_enemy_wide(stage_id, enemy_wide_dict, stage_enemies_dict):
 
 def set_data_train_val_by_stage_with_char_enemy_wide(
     df, embeddings, stage_id_to_idx, char_id_to_idx, stat_dict,
-    char_wide_dict, enemy_wide_dict, stage_enemies_dict, enemy_stat_dict
+    char_wide_dict, enemy_wide_dict, stage_enemies_dict, enemy_stat_dict,
+    batch_size=64
 ):
     wide_inputs, deep_inputs, labels = [], [], []
 
@@ -51,16 +52,16 @@ def set_data_train_val_by_stage_with_char_enemy_wide(
     w_train, w_temp, d_train, d_temp, y_train, y_temp = train_test_split(wide_x, deep_x, y, test_size=0.3)
     w_val, w_test, d_val, d_test, y_val, y_test = train_test_split(w_temp, d_temp, y_temp, test_size=0.5)
 
-    train_loader = DataLoader(TensorDataset(w_train, d_train, y_train), batch_size=64, shuffle=True)
-    val_loader = DataLoader(TensorDataset(w_val, d_val, y_val), batch_size=64)
-    test_loader = DataLoader(TensorDataset(w_test, d_test, y_test), batch_size=64)
+    train_loader = DataLoader(TensorDataset(w_train, d_train, y_train), batch_size=batch_size, shuffle=True)
+    val_loader = DataLoader(TensorDataset(w_val, d_val, y_val), batch_size=batch_size)
+    test_loader = DataLoader(TensorDataset(w_test, d_test, y_test), batch_size=batch_size)
 
     return train_loader, val_loader, test_loader, w_train.shape[1], d_train.shape[1]
 
 
-def train_loop(model, train_loader, val_loader, epochs=10):
+def train_loop(model, train_loader, val_loader, epochs=10, learning_rate=1e-3):
     criterion = nn.BCELoss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
     for epoch in range(epochs):
         model.train()

@@ -11,7 +11,7 @@ stat_features = [
 from sklearn.preprocessing import MinMaxScaler
 import pandas as pd
 
-def get_normalize_scaler(character_df):
+def get_normalize_scaler(character_df, deep_dir):
 
     scaler = MinMaxScaler()
 
@@ -28,12 +28,13 @@ def get_normalize_scaler(character_df):
         char_id: normalized_stats[i]
         for i, char_id in enumerate(character_id_list)
     }
+    joblib.dump(char_stat_dict, f"{deep_dir}/char_stat_dict.pkl")
 
     return char_stat_dict
 
 # train_df = pd.read_csv("stage_character_train.csv")
 
-def make_stat_vector(train_df, char_stat_dict):
+def make_stat_vector(train_df, char_stat_dict, save_dir):
     # stat vector 붙이기
     stat_features_df = pd.DataFrame(
         train_df["character_id"].map(char_stat_dict).tolist(),
@@ -43,6 +44,15 @@ def make_stat_vector(train_df, char_stat_dict):
     # 붙이기
     train_df = pd.concat([train_df, stat_features_df], axis=1)
 
-    train_df.to_csv("deep_train_with_stats.csv", index=False)
+    train_df.to_csv(f"{save_dir}/deep_train_with_stats.csv", index=False)
+
+
+def make_char_feat(data_dir, deep_dir):
+    character_df = pd.read_csv(f"{data_dir}/characters.csv")
+    char_stat_dict = get_normalize_scaler(character_df, deep_dir)
+
+    train_df = pd.read_csv(f"{deep_dir}/stage_character_train.csv")
+
+    make_stat_vector(train_df, char_stat_dict, deep_dir)
 
 

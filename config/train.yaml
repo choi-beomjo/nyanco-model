@@ -1,0 +1,19 @@
+paths:
+  train_df: "preprocessing/deep/deep_train_with_stats.csv"
+  embeddings: "./graph/full_embeddings.pt"
+  node_mapping: "./graph/node_mapping_full.pt"
+  char_stat_dict: "./preprocessing/deep/char_stat_dict.pkl"
+  enemy_stat_dict: "./preprocessing/deep/enemy_stat_dict.pkl"
+  character_wide: "./preprocessing/wide/multi_hot/character_wide_feature_dict.pt"
+  enemy_wide: "./preprocessing/wide/multi_hot/enemy_wide_feature_dict.pt"
+  stage_enemies: "./preprocessing/wide/multi_hot/stage_enemies.pt"
+  model: "./model/wide_deep_model.pt"
+  characters_csv: "./db/characters.csv"
+  enemies_csv: "./db/enemies.csv"
+  stage_enemies_csv: "./db/stage_enemies.csv"
+
+hyperparameters:
+  batch_size: 64
+  learning_rate: 0.001
+  epochs: 10
+

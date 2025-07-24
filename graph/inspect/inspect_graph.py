@@ -2,8 +2,8 @@
 import torch
 
 # 파일 경로
-EDGE_FILE = "../graph/edge_index_full.pt"
-MAPPING_FILE = "../graph/node_mapping_full.pt"
+EDGE_FILE = "../edge_index_full.pt"
+MAPPING_FILE = "../node_mapping_full.pt"
 
 # 1. 데이터 로드
 edge_index = torch.load(EDGE_FILE)

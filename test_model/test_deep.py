@@ -1,5 +1,5 @@
 import torch
-from preprocessing.deep.stat_feature import get_normalize_scaler
+from preprocessing.deep.char_feature import get_normalize_scaler
 import pandas as pd
 import numpy as np
 
