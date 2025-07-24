@@ -1,14 +1,10 @@
-from embeddings.build_graph import load_db_csv, make_node_index, make_edge_list, save_edge_index, save_node_mapping, build_graph
+from embeddings.build_graph import build_graph
 from train.train_lightgcn import  load_graph_data, get_num_nodes, get_ids, make_data, make_positive_edge, train_gnn
-import yaml
 from wide.multi_hot import build_wide_features
 from deep.make_supervised import make_supervised
 from deep.char_feature import make_char_feat
 from deep.enemy_stat import make_enemy_feat
-
-def load_config(path="../config/preprocessing.yaml"):
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
+from util.load_config import load_config
 
 
 if __name__ == "__main__":
