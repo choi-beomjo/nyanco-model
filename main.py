@@ -49,6 +49,13 @@ if __name__ == "__main__":
     # ---------------------------
     # 4. 데이터셋 구성
     # ---------------------------
+
+    hyper_params = config["hyperparameters"]
+
+    epochs = hyper_params["epochs"]
+    learning_rate = hyper_params["learning_rate"]
+    batch_size = hyper_params["batch_size"]
+
     train_loader, val_loader, test_loader, wide_input_dim, deep_input_dim = set_data_train_val_by_stage_with_char_enemy_wide(
         train_df,
         embeddings,
@@ -58,14 +65,16 @@ if __name__ == "__main__":
         char_wide_dict,
         enemy_wide_dict,
         stage_enemies_dict,
-        enemy_stat_dict
+        enemy_stat_dict,
+        batch_size
     )
 
     # ---------------------------
     # 5. 모델 생성 및 학습
     # ---------------------------
+
     model = WideAndDeep(wide_input_dim=wide_input_dim, deep_input_dim=deep_input_dim)
-    train_loop(model, train_loader=train_loader, val_loader=val_loader, epochs=40)
+    train_loop(model, train_loader=train_loader, val_loader=val_loader, epochs=epochs, learning_rate=learning_rate)
 
     # ---------------------------
     # 6. 테스트
