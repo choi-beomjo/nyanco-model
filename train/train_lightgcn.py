@@ -3,6 +3,8 @@ from torch_geometric.nn import LightGCN
 from torch_geometric.utils import negative_sampling
 from torch_geometric.data import Data
 from tqdm import tqdm
+import numpy as np
+import json
 
 # 데이터 로드
 
@@ -77,7 +79,7 @@ def train_gnn(graph_dir, data, positive_edges, num_nodes):
         loss.backward()
         optimizer.step()
 
-        print(f"Epoch {epoch:03d}, Loss: {loss.item():.4f}")
+        #print(f"Epoch {epoch:03d}, Loss: {loss.item():.4f}")
 
     # 최종 임베딩 저장
     model.eval()
@@ -85,6 +87,13 @@ def train_gnn(graph_dir, data, positive_edges, num_nodes):
         final_embeddings = model.get_embedding(data.edge_index)
 
     torch.save(final_embeddings, f"{graph_dir}/full_embeddings.pt")
+
+    np.save(f"{graph_dir}/full_embeddings.npy", final_embeddings.numpy())
+
+    embedding_list = final_embeddings.numpy().tolist()
+    with open(f"{graph_dir}/full_embeddings.json", "w", encoding="utf-8") as f:
+        json.dump(embedding_list, f, ensure_ascii=False, indent=2)
+
     print("Character embeddings saved.")
 
 
