@@ -169,6 +169,14 @@ def save_node_mapping(graph_dir: str, character_id_to_idx: Dict, enemy_id_to_idx
     }
     torch.save(node_mapping, f"{graph_dir}/node_mapping_full.pt")
 
+    node_mapping_json = {
+        key: {str(k): v for k, v in mapping.items()}
+        for key, mapping in node_mapping.items()
+    }
+
+    with open(f"{graph_dir}/node_mapping_full.json", "w", encoding="utf-8") as f:
+        json.dump(node_mapping_json, f, ensure_ascii=False, indent=2)
+
 
 def build_graph(DATA_DIR, GRAPH_DIR):
 
